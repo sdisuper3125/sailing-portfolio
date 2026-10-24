@@ -16,6 +16,8 @@ const SITE = {
   portrait: 'photos/portrait.webp',
   contact: [
     { label: 'Email', value: 'sdisuper3125@gmail.com', href: 'mailto:sdisuper3125@gmail.com' },
+    { label: 'Instagram', value: 'Instagram', href: 'https://www.instagram.com/sdisuper3125/' },
+    { label: 'Facebook', value: 'Facebook', href: 'https://www.facebook.com/sdisuper3125/' },
   ],
 };
 

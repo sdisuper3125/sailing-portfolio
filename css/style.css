@@ -310,3 +310,7 @@ body.lb-open { overflow: hidden; }
 @keyframes lbImg { from { opacity: 0; transform: scale(.94) translateY(8px); } to { opacity: 1; transform: none; } }
 .bar .music { margin-left: auto; margin-right: 6px; padding: 7px 11px; }
 .bar .music + .lang { margin-left: 0; }
+
+.social-foot { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin: 28px 0 8px; padding-top: 18px; border-top: 1px solid rgba(0,0,0,.1); }
+.social-foot a { color: var(--coral); font-weight: 700; text-decoration: none; padding: 8px 16px; border: 1.5px solid currentColor; border-radius: 999px; font-size: 14px; }
+.social-foot a:active { opacity: .6; }

@@ -38,10 +38,11 @@ function block(b) {
 }
 
 const volCard = (p) => `<p class="vol-line">${esc(p.vol)}</p>`;
-export const renderPort = (p) => volCard(p) + p.blocks.map(block).join('');
+const socialFoot = () => `<div class="social-foot">${SITE.contact.map((c) => `<a href="${esc(c.href)}"${c.href.startsWith('http') ? ' target="_blank" rel="noopener"' : ''}>${esc(c.label)}</a>`).join('')}</div>`;
+export const renderPort = (p) => volCard(p) + p.blocks.map(block).join('') + socialFoot();
 
 export function renderSimple() {
-  const contact = SITE.contact.map((c) => `<a href="${esc(c.href)}">${esc(c.value)}</a>`).join(' · ');
+  const contact = SITE.contact.map((c) => `<a href="${esc(c.href)}"${c.href.startsWith('http') ? ' target="_blank" rel="noopener"' : ''}>${esc(c.value)}</a>`).join(' · ');
   return `
     <header class="s-hero">
       <img class="s-portrait" src="${esc(SITE.portrait)}" alt="${esc(SITE.name)}">
