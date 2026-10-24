@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+  <meta name="theme-color" content="#2a1f4d">
+  <title>Logan 的航海日誌</title>
+  <meta name="description" content="張皓哲 Logan 的互動式自我介紹：駕駛帆船沿台灣海岸航行，一個港口說說我的一個面向。">
+  <meta property="og:title" content="Logan 的航海日誌">
+  <meta property="og:description" content="駕駛帆船沿台灣海岸航行，一個港口認識我的一個面向。">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E⛵%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,600&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css?v=20261024d">
+</head>
+<body>
+  <canvas id="c" aria-hidden="true"></canvas>
+
+  <header id="top">
+    <div class="bar">
+      <div class="brand"><b>Logan</b><span>航海日誌</span></div>
+      <button id="btn-simple" class="ghost" type="button">文字版</button>
+    </div>
+    <nav id="chips" aria-label="港口導覽"></nav>
+  </header>
+
+  <div id="labels" aria-hidden="true"></div>
+
+  <button id="mini" type="button" aria-label="開啟全景地圖"><canvas></canvas><b>地圖</b></button>
+  <div id="bigmap" aria-label="全景地圖"><div class="bm-card"><p>你在這裡 · 全景地圖</p><div class="bm-wrap"><canvas></canvas><div class="bm-ports"></div></div><div class="bm-info" id="bmInfo"><b>點港口，看我想當志工的理由</b></div><small>點空白處關閉</small></div></div>
+
+  <button id="score" type="button" aria-label="垃圾清除進度">♻ 0/0</button>
+
+  <div id="tools">
+    <button id="btn-cam" type="button" aria-label="切換視角"><i>🎥</i><b>後方</b></button>
+    <button id="btn-anchor" type="button" aria-label="下錨或起錨"><i>⚓</i><b>下錨</b></button>
+    <button id="btn-spin" type="button" aria-label="升起或收起球帆"><i>🎈</i><b>球帆</b></button>
+    <button id="btn-clean" type="button" hidden aria-label="派小人上岸清垃圾"><i>🧹</i><b>上岸</b></button>
+  </div>
+
+  <div id="fade" aria-hidden="true"><span id="fadeText"></span></div>
+
+  <button id="hud" type="button" aria-label="風向羅盤，點一下改變風向">
+    <svg viewBox="-50 -50 100 100" width="84" height="84">
+      <circle r="46" class="hud-bg"/>
+      <g id="dial">
+        <g class="hud-ticks"><text y="-35" text-anchor="middle">N</text><text x="36" y="3" text-anchor="middle">E</text><text y="41" text-anchor="middle">S</text><text x="-36" y="3" text-anchor="middle">W</text></g>
+        <g id="windGroup">
+          <path d="M0 0 L-32.5 -32.5 A46 46 0 0 1 32.5 -32.5 Z" class="hud-nogo"/>
+          <path d="M0 -15 L7 -29 L2.2 -29 L2.2 -45 L-2.2 -45 L-2.2 -29 L-7 -29 Z" class="hud-wind"/>
+        </g>
+      </g>
+      <path d="M0 -13 C6 -6 6 8 3 14 L-3 14 C-6 8 -6 -6 0 -13 Z" class="hud-boat"/>
+    </svg>
+    <div class="hud-text"><span id="hWind">風 --</span><span id="hSpeed">船速 --</span></div>
+  </button>
+
+  <div id="status" hidden>
+    <span id="statusText">自動航行中</span>
+    <button id="btn-skip" type="button">直接抵達</button>
+    <button id="btn-stop" type="button">取消</button>
+  </div>
+
+  <div id="controls">
+    <button id="steerL" type="button" aria-label="向左轉舵">◀</button>
+    <button id="steerR" type="button" aria-label="向右轉舵">▶</button>
+  </div>
+  <div id="toast" role="status"></div>
+
+  <aside id="panel" hidden aria-live="polite">
+    <div class="p-head">
+      <div><span class="p-tag" id="pTag"></span><h2 id="pTitle"></h2></div>
+      <button id="pClose" type="button" aria-label="關閉">✕</button>
+    </div>
+    <div class="p-body" id="pBody"></div>
+    <div class="p-foot"><button id="pNext" type="button"><span></span><small></small></button></div>
+  </aside>
+
+  <section id="intro">
+    <div class="intro-card">
+      <div class="pg on" data-pg="1">
+        <p class="eyebrow" id="iSub"></p>
+        <h1 id="iTitle"></h1>
+        <p class="intro-lead" id="iLead"></p>
+        <p class="intro-lead" id="iWhat"></p>
+        <div class="intro-actions">
+          <button id="btn-next-pg" type="button" class="primary">下一頁 →</button>
+          <button id="btn-intro-simple" type="button" class="ghost dark">直接看文字版</button>
+        </div>
+      </div>
+      <div class="pg" data-pg="2">
+        <p class="tut-h">快速上手 <span>左右滑動看 5 步</span></p>
+        <ul class="howto">
+          <li><b>◀ ▶</b> 按住轉舵，放開會保持航向</li>
+          <li><b>風向</b> 迎風不能直走，要之字形前進</li>
+        </ul>
+      <div class="tut-wrap"><button class="tut-nav prev" type="button" aria-label="上一張" disabled>‹</button><button class="tut-nav next" type="button" aria-label="下一張">›</button><div class="tut" tabindex="0">
+          <figure><img src="img/tut-nav.jpg" alt="點上方港口按鈕" loading="lazy"><figcaption><b>1 · 快速出發</b>點上方港口，約 3 秒直達。點海上的港口標籤則是完整航行過去。</figcaption></figure>
+          <figure><img src="img/tut-anchor.jpg" alt="按錨形按鈕" loading="lazy"><figcaption><b>2 · 下錨</b>想停下來就按右側 ⚓，船會停穩。再按一次或轉舵就起錨。</figcaption></figure>
+          <figure><img src="img/tut-clean.jpg" alt="按掃帚按鈕上岸清垃圾" loading="lazy"><figcaption><b>3 · 上岸清垃圾</b>在海灘附近下錨後，會出現 🧹 按鈕，按下去小人就會划小艇上岸。</figcaption></figure>
+          <figure><img src="img/tut-beach.jpg" alt="小人在岸上撿垃圾" loading="lazy"><figcaption><b>4 · 撿完回船</b>小人會依序撿起岸上的垃圾堆再回到船上。海上的垃圾，開船靠近就能撈起。</figcaption></figure>
+          <figure><img src="img/tut-map.jpg" alt="全景地圖" loading="lazy"><figcaption><b>5 · 看地圖</b>點左側小地圖，打開全景地圖。橘色箭頭是你，點港口可直接前往。</figcaption></figure>
+        </div></div>
+        <div class="intro-actions">
+          <button id="btn-start" type="button" class="primary">出海航行 ⛵</button>
+          <button id="btn-prev-pg" type="button" class="ghost dark">← 上一頁</button>
+        </div>
+      </div>
+      <p class="loading" id="loading">海面準備中⋯</p>
+    </div>
+  </section>
+
+  <main id="simple" hidden>
+    <button id="btn-back" type="button" class="primary small">⛵ 回到航海</button>
+    <div class="s-inner" id="simpleBody"></div>
+  </main>
+
+  <figure id="lightbox" hidden><img alt=""><figcaption></figcaption></figure>
+
+  <noscript><p style="position:fixed;inset:0;background:#fff6ec;padding:2rem;z-index:99">這個網站需要 JavaScript。Logan 張皓哲，Email: sdisuper3125@gmail.com</p></noscript>
+  <script src="js/content.js?v=20261024d"></script>
+  <script src="js/content-en.js?v=20261024d"></script>
+  <script src="js/lang.js?v=20261024d"></script>
+  <script src="js/app.js?v=20261024d"></script>
+  <script src="js/music.js?v=20261024d"></script>
+</body>
+</html>
